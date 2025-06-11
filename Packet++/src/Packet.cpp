@@ -66,13 +66,15 @@ namespace pcpp
 		Layer* curLayer = m_FirstLayer;
 		while (curLayer != nullptr &&
 		       (parseUntil == UnknownProtocol || !curLayer->isMemberOfProtocolFamily(parseUntil)) &&
-		       curLayer->getOsiModelLayer() <= parseUntilLayer)
+		       curLayer->getOsiModelLayer() < parseUntilLayer)
 		{
 			curLayer->parseNextLayer();
 			curLayer->m_IsAllocatedInPacket = true;
 			curLayer = curLayer->getNextLayer();
 			if (curLayer != nullptr)
 				m_LastLayer = curLayer;
+
+			// PCPP_LOG_DEBUG("Reached protocol: " << std::to_string(m_LastLayer->getProtocol()));
 		}
 
 		if (curLayer != nullptr && curLayer->isMemberOfProtocolFamily(parseUntil))
