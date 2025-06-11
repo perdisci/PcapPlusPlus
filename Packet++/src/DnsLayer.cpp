@@ -1,5 +1,10 @@
 #define LOG_MODULE PacketLogModuleDnsLayer
 
+#include "IPv4Layer.h"
+#include "IPv6Layer.h"
+#include "TcpLayer.h"
+#include "UdpLayer.h"
+
 #include "DnsLayer.h"
 #include "Logger.h"
 #include <sstream>
@@ -132,6 +137,26 @@ namespace pcpp
 		return true;
 	}
 
+	std::string DnsLayer::getPrintablePayload(const uint8_t* data, size_t dataLen, size_t maxLen)
+	{
+		std::string sanitizedPayload; // Declare a string to build the result
+		size_t lenToProcess = std::min(dataLen, maxLen);
+
+		sanitizedPayload.reserve(lenToProcess); //Pre-allocate memory for efficiency
+
+		for (size_t i = 0; i < lenToProcess; ++i)
+		{
+			char c = static_cast<char>(data[i]);
+			if (std::isprint(static_cast<unsigned char>(c))) {
+				sanitizedPayload.push_back(c); // Append printable character
+			} else {
+				sanitizedPayload.push_back('.'); // Append a dot for non-printable
+			}
+		}
+
+		return sanitizedPayload; // Return the constructed string
+	}
+
 	void DnsLayer::parseResources()
 	{
 		size_t offsetInPacket = getBasicHeaderSize();
@@ -146,8 +171,62 @@ namespace pcpp
 
 		if (numOfOtherResources > 300)
 		{
+			std::string srcIP;
+			std::string dstIP;
+			uint16_t srcPort = 0;
+			uint16_t dstPort = 0;
+			uint16_t proto = 0;
+
+			Layer* transportLayer = this->getPrevLayer();
+			if (transportLayer != nullptr)
+			{
+				Layer* networkLayer = transportLayer->getPrevLayer();
+				if (networkLayer != nullptr)
+				{
+					if (networkLayer->getProtocol() == pcpp::IPv4)
+					{
+						srcIP = static_cast<pcpp::IPv4Layer*>(networkLayer)->getSrcIPAddress().toString();
+						dstIP = static_cast<pcpp::IPv4Layer*>(networkLayer)->getDstIPAddress().toString();
+					}	
+					else if (networkLayer->getProtocol() == pcpp::IPv6)
+					{
+						srcIP = static_cast<pcpp::IPv6Layer*>(networkLayer)->getSrcIPAddress().toString();
+						dstIP = static_cast<pcpp::IPv6Layer*>(networkLayer)->getDstIPAddress().toString();
+					}
+				}
+				
+				proto = transportLayer->getProtocol();
+
+				if (transportLayer->getProtocol() == pcpp::TCP)
+				{
+					srcPort = static_cast<pcpp::TcpLayer*>(transportLayer)->getSrcPort();
+					dstPort = static_cast<pcpp::TcpLayer*>(transportLayer)->getDstPort();
+				}
+				else if (transportLayer->getProtocol() == pcpp::UDP)
+				{
+					srcPort = static_cast<pcpp::UdpLayer*>(transportLayer)->getSrcPort();
+					dstPort = static_cast<pcpp::UdpLayer*>(transportLayer)->getDstPort();
+				}
+			}
+
+			std::string protoStr;
+			if (proto == pcpp::TCP)
+				protoStr = "TCP";
+			else if (proto == pcpp::UDP)
+				protoStr = "UDP";
+			else
+				protoStr = "Unknown";
+
 			PCPP_LOG_ERROR(
-			    "DNS layer contains more than 300 resources, probably a bad packet. Skipping parsing DNS resources");
+			    "DNS layer contains more than 300 resources, probably a bad packet. Skipping parsing DNS resources :: "
+				<< " srcIP=" << srcIP << ", dstIP=" << dstIP
+				<< ", srcPort=" << srcPort << ", dstPort=" << dstPort
+				<< ", proto=" << protoStr
+				<< ", numOfQuestions=" << numOfQuestions
+				<< ", numOfAnswers=" << numOfAnswers
+				<< ", numOfAuthority=" << numOfAuthority
+				<< ", numOfAdditional=" << numOfAdditional
+				<< ", payload=" << this->getPrintablePayload(this->getData(), this->getDataLen(), 100));
 			return;
 		}
 

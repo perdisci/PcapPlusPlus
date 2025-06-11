@@ -1,5 +1,10 @@
 #define LOG_MODULE PacketLogModuleDnsLayer
 
+#include "IPv4Layer.h"
+#include "IPv6Layer.h"
+#include "TcpLayer.h"
+#include "UdpLayer.h"
+
 #include "DnsResource.h"
 #include "Logger.h"
 #include <sstream>
@@ -79,7 +84,61 @@ namespace pcpp
 				    (wordLength & 0x3f) * 256 + (0xFF & encodedName[1]) + m_DnsLayer->m_OffsetAdjustment;
 				if (offsetInLayer < sizeof(dnshdr) || offsetInLayer >= m_DnsLayer->m_DataLen)
 				{
-					PCPP_LOG_ERROR("DNS parsing error: name pointer is illegal");
+					std::string srcIP;
+					std::string dstIP;
+					uint16_t srcPort = 0;
+					uint16_t dstPort = 0;
+					uint16_t proto = 0;
+
+					Layer* transportLayer = m_DnsLayer->getPrevLayer();
+					if (transportLayer != nullptr)
+					{
+						Layer* networkLayer = transportLayer->getPrevLayer();
+						if (networkLayer != nullptr)
+						{
+							if (networkLayer->getProtocol() == pcpp::IPv4)
+							{
+								srcIP = static_cast<pcpp::IPv4Layer*>(networkLayer)->getSrcIPAddress().toString();
+								dstIP = static_cast<pcpp::IPv4Layer*>(networkLayer)->getDstIPAddress().toString();
+							}	
+							else if (networkLayer->getProtocol() == pcpp::IPv6)
+							{
+								srcIP = static_cast<pcpp::IPv6Layer*>(networkLayer)->getSrcIPAddress().toString();
+								dstIP = static_cast<pcpp::IPv6Layer*>(networkLayer)->getDstIPAddress().toString();
+							}
+						}
+
+						proto = transportLayer->getProtocol();
+
+						if (transportLayer->getProtocol() == pcpp::TCP)
+						{
+							srcPort = static_cast<pcpp::TcpLayer*>(transportLayer)->getSrcPort();
+							dstPort = static_cast<pcpp::TcpLayer*>(transportLayer)->getDstPort();
+						}
+						else if (transportLayer->getProtocol() == pcpp::UDP)
+						{
+							srcPort = static_cast<pcpp::UdpLayer*>(transportLayer)->getSrcPort();
+							dstPort = static_cast<pcpp::UdpLayer*>(transportLayer)->getDstPort();
+						}
+					}
+
+					uint8_t* payload = m_DnsLayer->getDataPtr();
+					size_t payloadLen = m_DnsLayer->getDataLen();
+					std::string payloadStr = m_DnsLayer->getPrintablePayload(payload, payloadLen, 100);
+
+					std::string protoStr;
+					if (proto == pcpp::TCP)
+						protoStr = "TCP";
+					else if (proto == pcpp::UDP)
+						protoStr = "UDP";
+					else
+						protoStr = "Unknown";
+
+					PCPP_LOG_ERROR("DNS parsing error: name pointer is illegal :: " << " srcIP=" << srcIP << ", dstIP=" << dstIP
+						<< ", srcPort=" << srcPort << ", dstPort=" << dstPort
+						<< ", proto=" << protoStr 
+						<< ", payload=" << payloadStr);
+
 					return 0;
 				}
 

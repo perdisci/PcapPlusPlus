@@ -384,6 +384,8 @@ namespace pcpp
 		/// @return True if the data is valid and can represent a DNS packet
 		static inline bool isDataValid(const uint8_t* data, size_t dataLen, bool dnsOverTcp = false);
 
+		std::string getPrintablePayload(const uint8_t* data, size_t dataLen, size_t maxLen=100);
+
 	protected:
 		DnsLayer(uint8_t* data, size_t dataLen, Layer* prevLayer, Packet* packet, size_t offsetAdjustment);
 		explicit DnsLayer(size_t offsetAdjustment);
@@ -418,6 +420,7 @@ namespace pcpp
 		                         uint32_t ttl, IDnsResourceData* data);
 
 		bool removeResource(IDnsResource* resourceToRemove);
+
 	};
 
 	/// @class DnsOverTcpLayer
