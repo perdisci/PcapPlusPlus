@@ -150,6 +150,8 @@ namespace pcpp
 		void setRawPacket(RawPacket* rawPacket, bool freeRawPacket, ProtocolTypeFamily parseUntil = UnknownProtocol,
 		                  OsiModelLayer parseUntilLayer = OsiModelLayerUnknown);
 
+		void parseOneMoreLayer();
+
 		/// Get a pointer to the Packet's RawPacket in a read-only manner
 		/// @return A pointer to the Packet's RawPacket
 		const RawPacket* getRawPacketReadOnly() const

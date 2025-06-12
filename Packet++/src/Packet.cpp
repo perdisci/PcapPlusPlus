@@ -14,6 +14,7 @@
 #include "PacketTrailerLayer.h"
 #include "Logger.h"
 #include <numeric>
+#include <iostream>
 #include <sstream>
 #ifdef _MSC_VER
 #	include <time.h>
@@ -71,8 +72,10 @@ namespace pcpp
 			curLayer->parseNextLayer();
 			curLayer->m_IsAllocatedInPacket = true;
 			curLayer = curLayer->getNextLayer();
-			if (curLayer != nullptr)
+			if (curLayer != nullptr) {
 				m_LastLayer = curLayer;
+				m_LastLayer->m_IsAllocatedInPacket = true;
+			}
 
 			// PCPP_LOG_DEBUG("Reached protocol: " << std::to_string(m_LastLayer->getProtocol()));
 		}
@@ -115,6 +118,28 @@ namespace pcpp
 		}
 	}
 
+
+	void Packet::parseOneMoreLayer()
+	{
+		Layer* curLayer = m_LastLayer;
+
+		// std::cout << "Packet::parseOneMoreLayer :: Current layer : " << std::to_string(curLayer->getProtocol()) << std::endl;
+
+		curLayer->parseNextLayer();
+		curLayer->m_IsAllocatedInPacket = true;
+
+		Layer* nextLayer = curLayer->getNextLayer();
+
+		if (nextLayer != nullptr)
+		{
+			// std::cout << "Packet::parseOneMoreLayer :: Next layer : " << std::to_string(nextLayer->getProtocol()) << std::endl;
+
+			m_LastLayer = nextLayer;
+			m_LastLayer->m_IsAllocatedInPacket = true;
+		}
+	}
+
+
 	Packet::Packet(RawPacket* rawPacket, bool freeRawPacket, ProtocolType parseUntil, OsiModelLayer parseUntilLayer)
 	{
 		m_FreeRawPacket = false;
@@ -154,8 +179,13 @@ namespace pcpp
 		while (curLayer != nullptr)
 		{
 			Layer* nextLayer = curLayer->getNextLayer();
-			if (curLayer->m_IsAllocatedInPacket)
+
+			// std::cout << "Packet::destructPacketData :: Checking layer : " << std::to_string(curLayer->getProtocol()) << std::endl;
+
+			if (curLayer->m_IsAllocatedInPacket) {
+				// std::cout << "Packet :: Deleting layer : " << std::to_string(curLayer->getProtocol()) << std::endl;
 				delete curLayer;
+			}
 			curLayer = nextLayer;
 		}
 
