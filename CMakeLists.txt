@@ -273,6 +273,19 @@ if(PCAPPP_TARGET_COMPILER_CLANG OR PCAPPP_TARGET_COMPILER_GCC OR PCAPPP_TARGET_C
   add_compile_options(-Wall)
 endif()
 
+if(PCAPPP_TARGET_COMPILER_CLANG OR PCAPPP_TARGET_COMPILER_GCC)
+  add_compile_options(-Wextra)
+  add_compile_options(-Wpedantic)
+  add_compile_options(-fstack-protector-strong)
+  add_compile_options(-ftrivial-auto-var-init=pattern)
+endif()
+
+if(PCAPPP_TARGET_COMPILER_CLANG)
+  add_compile_options(-D_LIBCPP_ENABLE_HARDENED_MODE=1)
+elseif(PCAPPP_TARGET_COMPILER_GCC)
+  add_compile_options(-D_GLIBCXX_ASSERTIONS)
+endif()
+
 if(PCAPPP_BUILD_REPRODUCIBLE)
   add_definitions(-DPCAPPP_BUILD_REPRODUCIBLE)
   if(APPLE)
