@@ -5,11 +5,11 @@
 #include "PayloadLayer.h"
 #include "UdpLayer.h"
 #include "TcpLayer.h"
-#include "IcmpLayer.h"
-#include "GreLayer.h"
-#include "IgmpLayer.h"
-#include "IPSecLayer.h"
-#include "VrrpLayer.h"
+// #include "IcmpLayer.h"
+// #include "GreLayer.h"
+// #include "IgmpLayer.h"
+// #include "IPSecLayer.h"
+// #include "VrrpLayer.h"
 #include "PacketUtils.h"
 #include <sstream>
 #include "Logger.h"
@@ -272,7 +272,8 @@ namespace pcpp
 			tryConstructNextLayerWithFallback<TcpLayer, PayloadLayer>(payload, payloadLen, m_Packet);
 			break;
 		case PACKETPP_IPPROTO_ICMP:
-			tryConstructNextLayerWithFallback<IcmpLayer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// Removed for debloating
+			// tryConstructNextLayerWithFallback<IcmpLayer, PayloadLayer>(payload, payloadLen, m_Packet);
 			break;
 		case PACKETPP_IPPROTO_IPIP:
 		{
@@ -293,72 +294,77 @@ namespace pcpp
 		}
 		case PACKETPP_IPPROTO_GRE:
 		{
-			switch (GreLayer::getGREVersion(payload, payloadLen))
-			{
-			case GREv0:
-				tryConstructNextLayerWithFallback<GREv0Layer, PayloadLayer>(payload, payloadLen, m_Packet);
-				break;
-			case GREv1:
-				tryConstructNextLayerWithFallback<GREv1Layer, PayloadLayer>(payload, payloadLen, m_Packet);
-				break;
-			default:
-				constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);
-				break;
-			};
+			// Removed for debloating
+			// switch (GreLayer::getGREVersion(payload, payloadLen))
+			// {
+			// case GREv0:
+			// 	tryConstructNextLayerWithFallback<GREv0Layer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// 	break;
+			// case GREv1:
+			// 	tryConstructNextLayerWithFallback<GREv1Layer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// 	break;
+			// default:
+			// 	constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);
+			// 	break;
+			// };
 			break;
 		}
 		case PACKETPP_IPPROTO_IGMP:
 		{
-			bool igmpQuery = false;
-			ProtocolType igmpVer = IgmpLayer::getIGMPVerFromData(
-			    payload, std::min<size_t>(payloadLen, be16toh(getIPv4Header()->totalLength) - hdrLen), igmpQuery);
+			// Removed for debloating
+			// bool igmpQuery = false;
+			// ProtocolType igmpVer = IgmpLayer::getIGMPVerFromData(
+			//     payload, std::min<size_t>(payloadLen, be16toh(getIPv4Header()->totalLength) - hdrLen), igmpQuery);
 
-			switch (igmpVer)
-			{
-			case IGMPv1:
-				tryConstructNextLayerWithFallback<IgmpV1Layer, PayloadLayer>(payload, payloadLen, m_Packet);
-				break;
-			case IGMPv2:
-				tryConstructNextLayerWithFallback<IgmpV2Layer, PayloadLayer>(payload, payloadLen, m_Packet);
-				break;
-			case IGMPv3:
-			{
-				if (igmpQuery)
-					tryConstructNextLayerWithFallback<IgmpV3QueryLayer, PayloadLayer>(payload, payloadLen, m_Packet);
-				else
-					tryConstructNextLayerWithFallback<IgmpV3ReportLayer, PayloadLayer>(payload, payloadLen, m_Packet);
-				break;
-			}
-			default:
-				constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);
-				break;
-			}
+			// switch (igmpVer)
+			// {
+			// case IGMPv1:
+			// 	tryConstructNextLayerWithFallback<IgmpV1Layer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// 	break;
+			// case IGMPv2:
+			// 	tryConstructNextLayerWithFallback<IgmpV2Layer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// 	break;
+			// case IGMPv3:
+			// {
+			// 	if (igmpQuery)
+			// 		tryConstructNextLayerWithFallback<IgmpV3QueryLayer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// 	else
+			// 		tryConstructNextLayerWithFallback<IgmpV3ReportLayer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// 	break;
+			// }
+			// default:
+			// 	constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);
+			// 	break;
+			// }
 			break;
 		}
 		case PACKETPP_IPPROTO_AH:
-			tryConstructNextLayerWithFallback<AuthenticationHeaderLayer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// Removed for debloating
+			// tryConstructNextLayerWithFallback<AuthenticationHeaderLayer, PayloadLayer>(payload, payloadLen, m_Packet);
 			break;
 		case PACKETPP_IPPROTO_ESP:
-			tryConstructNextLayerWithFallback<ESPLayer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// Removed for debloating
+			// tryConstructNextLayerWithFallback<ESPLayer, PayloadLayer>(payload, payloadLen, m_Packet);
 			break;
 		case PACKETPP_IPPROTO_IPV6:
 			tryConstructNextLayerWithFallback<IPv6Layer, PayloadLayer>(payload, payloadLen, m_Packet);
 			break;
 		case PACKETPP_IPPROTO_VRRP:
 		{
-			switch (VrrpLayer::getVersionFromData(payload, payloadLen))
-			{
-			case VRRPv2:
-				tryConstructNextLayerWithFallback<VrrpV2Layer, PayloadLayer>(payload, payloadLen, m_Packet);
-				break;
-			case VRRPv3:
-				tryConstructNextLayerWithFallback<VrrpV3Layer, PayloadLayer>(payload, payloadLen, m_Packet,
-				                                                             IPAddress::IPv4AddressType);
-				break;
-			default:
-				constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);
-				break;
-			}
+			// Removed for debloating
+			// switch (VrrpLayer::getVersionFromData(payload, payloadLen))
+			// {
+			// case VRRPv2:
+			// 	tryConstructNextLayerWithFallback<VrrpV2Layer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// 	break;
+			// case VRRPv3:
+			// 	tryConstructNextLayerWithFallback<VrrpV3Layer, PayloadLayer>(payload, payloadLen, m_Packet,
+			// 	                                                             IPAddress::IPv4AddressType);
+			// 	break;
+			// default:
+			// 	constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);
+			// 	break;
+			// }
 			break;
 		}
 		}

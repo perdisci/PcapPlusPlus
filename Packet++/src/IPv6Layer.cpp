@@ -6,10 +6,10 @@
 #include "PayloadLayer.h"
 #include "UdpLayer.h"
 #include "TcpLayer.h"
-#include "GreLayer.h"
-#include "IPSecLayer.h"
-#include "IcmpV6Layer.h"
-#include "VrrpLayer.h"
+// #include "GreLayer.h"
+// #include "IPSecLayer.h"
+// #include "IcmpV6Layer.h"
+// #include "VrrpLayer.h"
 #include "Packet.h"
 #include "EndianPortable.h"
 
@@ -244,37 +244,42 @@ namespace pcpp
 		}
 		case PACKETPP_IPPROTO_GRE:
 		{
-			ProtocolType greVer = GreLayer::getGREVersion(payload, payloadLen);
-			if (greVer == GREv0 && GREv0Layer::isDataValid(payload, payloadLen))
-				m_NextLayer = new GREv0Layer(payload, payloadLen, this, m_Packet);
-			else if (greVer == GREv1 && GREv1Layer::isDataValid(payload, payloadLen))
-				m_NextLayer = new GREv1Layer(payload, payloadLen, this, m_Packet);
-			else
-				m_NextLayer = new PayloadLayer(payload, payloadLen, this, m_Packet);
+			// Removed for debloating
+			// ProtocolType greVer = GreLayer::getGREVersion(payload, payloadLen);
+			// if (greVer == GREv0 && GREv0Layer::isDataValid(payload, payloadLen))
+			// 	m_NextLayer = new GREv0Layer(payload, payloadLen, this, m_Packet);
+			// else if (greVer == GREv1 && GREv1Layer::isDataValid(payload, payloadLen))
+			// 	m_NextLayer = new GREv1Layer(payload, payloadLen, this, m_Packet);
+			// else
+			// 	m_NextLayer = new PayloadLayer(payload, payloadLen, this, m_Packet);
 			break;
 		}
 		case PACKETPP_IPPROTO_AH:
-			m_NextLayer = AuthenticationHeaderLayer::isDataValid(payload, payloadLen)
-			                  ? static_cast<Layer*>(new AuthenticationHeaderLayer(payload, payloadLen, this, m_Packet))
-			                  : static_cast<Layer*>(new PayloadLayer(payload, payloadLen, this, m_Packet));
+			// Removed for debloating
+			// m_NextLayer = AuthenticationHeaderLayer::isDataValid(payload, payloadLen)
+			//                   ? static_cast<Layer*>(new AuthenticationHeaderLayer(payload, payloadLen, this, m_Packet))
+			//                   : static_cast<Layer*>(new PayloadLayer(payload, payloadLen, this, m_Packet));
 			break;
 		case PACKETPP_IPPROTO_ESP:
-			m_NextLayer = ESPLayer::isDataValid(payload, payloadLen)
-			                  ? static_cast<Layer*>(new ESPLayer(payload, payloadLen, this, m_Packet))
-			                  : static_cast<Layer*>(new PayloadLayer(payload, payloadLen, this, m_Packet));
+			// Removed for debloating
+			// m_NextLayer = ESPLayer::isDataValid(payload, payloadLen)
+			//                   ? static_cast<Layer*>(new ESPLayer(payload, payloadLen, this, m_Packet))
+			//                   : static_cast<Layer*>(new PayloadLayer(payload, payloadLen, this, m_Packet));
 			break;
 		case PACKETPP_IPPROTO_ICMPV6:
 		{
-			m_NextLayer = IcmpV6Layer::parseIcmpV6Layer(payload, payloadLen, this, m_Packet);
+			// Removed for debloating
+			// m_NextLayer = IcmpV6Layer::parseIcmpV6Layer(payload, payloadLen, this, m_Packet);
 			break;
 		}
 		case PACKETPP_IPPROTO_VRRP:
 		{
-			auto vrrpVer = VrrpLayer::getVersionFromData(payload, payloadLen);
-			if (vrrpVer == VRRPv3)
-				m_NextLayer = new VrrpV3Layer(payload, payloadLen, this, m_Packet, IPAddress::IPv6AddressType);
-			else
-				m_NextLayer = new PayloadLayer(payload, payloadLen, this, m_Packet);
+			// Removed for debloating
+			// auto vrrpVer = VrrpLayer::getVersionFromData(payload, payloadLen);
+			// if (vrrpVer == VRRPv3)
+			// 	m_NextLayer = new VrrpV3Layer(payload, payloadLen, this, m_Packet, IPAddress::IPv6AddressType);
+			// else
+			// 	m_NextLayer = new PayloadLayer(payload, payloadLen, this, m_Packet);
 			break;
 		}
 		default:

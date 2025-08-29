@@ -4,10 +4,10 @@
 #include "IPv4Layer.h"
 #include "IPv6Layer.h"
 #include "PayloadLayer.h"
-#include "ArpLayer.h"
-#include "PPPoELayer.h"
-#include "MplsLayer.h"
-#include "LLCLayer.h"
+// #include "ArpLayer.h"
+// #include "PPPoELayer.h"
+// #include "MplsLayer.h"
+// #include "LLCLayer.h"
 #include <sstream>
 #include "EndianPortable.h"
 
@@ -81,30 +81,40 @@ namespace pcpp
 			                  : static_cast<Layer*>(new PayloadLayer(payload, payloadLen, this, m_Packet));
 			break;
 		case PCPP_ETHERTYPE_ARP:
-			m_NextLayer = new ArpLayer(payload, payloadLen, this, m_Packet);
+			// Removed for debloating
+			// m_NextLayer = new ArpLayer(payload, payloadLen, this, m_Packet);
 			break;
 		case PCPP_ETHERTYPE_VLAN:
 		case PCPP_ETHERTYPE_IEEE_802_1AD:
 			m_NextLayer = new VlanLayer(payload, payloadLen, this, m_Packet);
 			break;
 		case PCPP_ETHERTYPE_PPPOES:
-			m_NextLayer = PPPoESessionLayer::isDataValid(payload, payloadLen)
-			                  ? static_cast<Layer*>(new PPPoESessionLayer(payload, payloadLen, this, m_Packet))
-			                  : static_cast<Layer*>(new PayloadLayer(payload, payloadLen, this, m_Packet));
+			// Removed for debloating
+			// m_NextLayer = PPPoESessionLayer::isDataValid(payload, payloadLen)
+			//                   ? static_cast<Layer*>(new PPPoESessionLayer(payload, payloadLen, this, m_Packet))
+			//                   : static_cast<Layer*>(new PayloadLayer(payload, payloadLen, this, m_Packet));
 			break;
 		case PCPP_ETHERTYPE_PPPOED:
-			m_NextLayer = PPPoEDiscoveryLayer::isDataValid(payload, payloadLen)
-			                  ? static_cast<Layer*>(new PPPoEDiscoveryLayer(payload, payloadLen, this, m_Packet))
-			                  : static_cast<Layer*>(new PayloadLayer(payload, payloadLen, this, m_Packet));
+			// Removed for debloating
+			// m_NextLayer = PPPoEDiscoveryLayer::isDataValid(payload, payloadLen)
+			//                   ? static_cast<Layer*>(new PPPoEDiscoveryLayer(payload, payloadLen, this, m_Packet))
+			//                   : static_cast<Layer*>(new PayloadLayer(payload, payloadLen, this, m_Packet));
 			break;
 		case PCPP_ETHERTYPE_MPLS:
-			m_NextLayer = new MplsLayer(payload, payloadLen, this, m_Packet);
+			// Removed for debloating
+			// m_NextLayer = new MplsLayer(payload, payloadLen, this, m_Packet);
 			break;
 		default:
-			m_NextLayer = (be16toh(hdr->etherType) < 1500 && LLCLayer::isDataValid(payload, payloadLen))
-			                  ? static_cast<Layer*>(new LLCLayer(payload, payloadLen, this, m_Packet))
-			                  : static_cast<Layer*>(new PayloadLayer(payload, payloadLen, this, m_Packet));
+			// Removed for debloating
+			// m_NextLayer = (be16toh(hdr->etherType) < 1500 && LLCLayer::isDataValid(payload, payloadLen))
+			//                   ? static_cast<Layer*>(new LLCLayer(payload, payloadLen, this, m_Packet))
+			//                   : static_cast<Layer*>(new PayloadLayer(payload, payloadLen, this, m_Packet));
+			break;
 		}
+
+		// If no next layer was constructed, assume it's a payload layer
+		if (!hasNextLayer())
+			constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);
 	}
 
 	void VlanLayer::computeCalculateFields()

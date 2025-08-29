@@ -5,19 +5,19 @@
 #include "IPv4Layer.h"
 #include "IPv6Layer.h"
 #include "PayloadLayer.h"
-#include "HttpLayer.h"
-#include "SSLLayer.h"
-#include "SipLayer.h"
-#include "BgpLayer.h"
-#include "SSHLayer.h"
+// #include "HttpLayer.h"
+// #include "SSLLayer.h"
+// #include "SipLayer.h"
+// #include "BgpLayer.h"
+// #include "SSHLayer.h"
 #include "DnsLayer.h"
-#include "TelnetLayer.h"
-#include "TpktLayer.h"
-#include "FtpLayer.h"
-#include "SomeIpLayer.h"
-#include "SmtpLayer.h"
-#include "LdapLayer.h"
-#include "GtpLayer.h"
+// #include "TelnetLayer.h"
+// #include "TpktLayer.h"
+// #include "FtpLayer.h"
+// #include "SomeIpLayer.h"
+// #include "SmtpLayer.h"
+// #include "LdapLayer.h"
+// #include "GtpLayer.h"
 #include "PacketUtils.h"
 #include "Logger.h"
 #include "DeprecationUtils.h"
@@ -366,96 +366,100 @@ namespace pcpp
 		const uint16_t portSrc = getSrcPort();
 		const char* payloadChar = reinterpret_cast<const char*>(payload);
 
-		if (HttpMessage::isHttpPort(portDst) &&
-		    HttpRequestFirstLine::parseMethod(payloadChar, payloadLen) != HttpRequestLayer::HttpMethodUnknown)
-		{
-			constructNextLayer<HttpRequestLayer>(payload, payloadLen, m_Packet);
-		}
-		else if (HttpMessage::isHttpPort(portSrc) &&
-		         HttpResponseFirstLine::parseVersion(payloadChar, payloadLen) != HttpVersion::HttpVersionUnknown &&
-		         !HttpResponseFirstLine::parseStatusCode(payloadChar, payloadLen).isUnsupportedCode())
-		{
-			constructNextLayer<HttpResponseLayer>(payload, payloadLen, m_Packet);
-		}
-		else if (SSLLayer::IsSSLMessage(portSrc, portDst, payload, payloadLen))
-		{
-			setNextLayer(SSLLayer::createSSLMessage(payload, payloadLen, this, m_Packet));
-		}
-		else if (SipLayer::isSipPort(portDst) || SipLayer::isSipPort(portSrc))
-		{
-			if (SipRequestFirstLine::parseMethod(payloadChar, payloadLen) != SipRequestLayer::SipMethodUnknown)
-			{
-				constructNextLayer<SipRequestLayer>(payload, payloadLen, m_Packet);
-			}
-			else if (SipResponseFirstLine::parseStatusCode(payloadChar, payloadLen) !=
-			         SipResponseLayer::SipStatusCodeUnknown)
-			{
-				constructNextLayer<SipResponseLayer>(payload, payloadLen, m_Packet);
-			}
-			else
-			{
-				constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);
-			}
-		}
-		else if (BgpLayer::isBgpPort(portSrc, portDst))
-		{
-			m_NextLayer = BgpLayer::parseBgpLayer(payload, payloadLen, this, m_Packet);
-			if (!m_NextLayer)
-				constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);
-		}
-		else if (SSHLayer::isSSHPort(portSrc, portDst))
-		{
-			setNextLayer(SSHLayer::createSSHMessage(payload, payloadLen, this, m_Packet));
-		}
-		else if (DnsLayer::isDataValid(payload, payloadLen, true) &&
+		if (DnsLayer::isDataValid(payload, payloadLen, true) &&
 		         (DnsLayer::isDnsPort(portDst) || DnsLayer::isDnsPort(portSrc)))
 		{
 			constructNextLayer<DnsOverTcpLayer>(payload, payloadLen, m_Packet);
 		}
-		else if (TelnetLayer::isDataValid(payload, payloadLen) &&
-		         (TelnetLayer::isTelnetPort(portDst) || TelnetLayer::isTelnetPort(portSrc)))
-		{
-			constructNextLayer<TelnetLayer>(payload, payloadLen, m_Packet);
-		}
-		else if (FtpLayer::isFtpPort(portSrc) && FtpLayer::isDataValid(payload, payloadLen))
-		{
-			constructNextLayer<FtpResponseLayer>(payload, payloadLen, m_Packet);
-		}
-		else if (FtpLayer::isFtpPort(portDst) && FtpLayer::isDataValid(payload, payloadLen))
-		{
-			constructNextLayer<FtpRequestLayer>(payload, payloadLen, m_Packet);
-		}
-		else if (FtpLayer::isFtpDataPort(portSrc) || FtpLayer::isFtpDataPort(portDst))
-		{
-			constructNextLayer<FtpDataLayer>(payload, payloadLen, m_Packet);
-		}
-		else if (SomeIpLayer::isSomeIpPort(portSrc) || SomeIpLayer::isSomeIpPort(portDst))
-		{
-			setNextLayer(SomeIpLayer::parseSomeIpLayer(payload, payloadLen, this, m_Packet));
-		}
-		else if (TpktLayer::isDataValid(payload, payloadLen) && TpktLayer::isTpktPort(portSrc, portDst))
-		{
-			constructNextLayer<TpktLayer>(payload, payloadLen, m_Packet);
-		}
-		else if (SmtpLayer::isSmtpPort(portSrc) && SmtpLayer::isDataValid(payload, payloadLen))
-		{
-			constructNextLayer<SmtpResponseLayer>(payload, payloadLen, m_Packet);
-		}
-		else if (SmtpLayer::isSmtpPort(portDst) && SmtpLayer::isDataValid(payload, payloadLen))
-		{
-			constructNextLayer<SmtpRequestLayer>(payload, payloadLen, m_Packet);
-		}
-		else if (LdapLayer::isLdapPort(portDst) || LdapLayer::isLdapPort(portSrc))
-		{
-			m_NextLayer = LdapLayer::parseLdapMessage(payload, payloadLen, this, m_Packet);
-			if (!m_NextLayer)
-				constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);
-		}
-		else if ((GtpV2Layer::isGTPv2Port(portDst) || GtpV2Layer::isGTPv2Port(portSrc)) &&
-		         GtpV2Layer::isDataValid(payload, payloadLen))
-		{
-			constructNextLayer<GtpV2Layer>(payload, payloadLen, m_Packet);
-		}
+
+		// === Removed for debloating ===
+		// else if (HttpMessage::isHttpPort(portDst) &&
+		//     HttpRequestFirstLine::parseMethod(payloadChar, payloadLen) != HttpRequestLayer::HttpMethodUnknown)
+		// {
+		// 	constructNextLayer<HttpRequestLayer>(payload, payloadLen, m_Packet);
+		// }
+		// else if (HttpMessage::isHttpPort(portSrc) &&
+		//          HttpResponseFirstLine::parseVersion(payloadChar, payloadLen) != HttpVersion::HttpVersionUnknown &&
+		//          !HttpResponseFirstLine::parseStatusCode(payloadChar, payloadLen).isUnsupportedCode())
+		// {
+		// 	constructNextLayer<HttpResponseLayer>(payload, payloadLen, m_Packet);
+		// }
+		// else if (SSLLayer::IsSSLMessage(portSrc, portDst, payload, payloadLen))
+		// {
+		// 	setNextLayer(SSLLayer::createSSLMessage(payload, payloadLen, this, m_Packet));
+		// }
+		// else if (SipLayer::isSipPort(portDst) || SipLayer::isSipPort(portSrc))
+		// {
+		// 	if (SipRequestFirstLine::parseMethod(payloadChar, payloadLen) != SipRequestLayer::SipMethodUnknown)
+		// 	{
+		// 		constructNextLayer<SipRequestLayer>(payload, payloadLen, m_Packet);
+		// 	}
+		// 	else if (SipResponseFirstLine::parseStatusCode(payloadChar, payloadLen) !=
+		// 	         SipResponseLayer::SipStatusCodeUnknown)
+		// 	{
+		// 		constructNextLayer<SipResponseLayer>(payload, payloadLen, m_Packet);
+		// 	}
+		// 	else
+		// 	{
+		// 		constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);
+		// 	}
+		// }
+		// else if (BgpLayer::isBgpPort(portSrc, portDst))
+		// {
+		// 	m_NextLayer = BgpLayer::parseBgpLayer(payload, payloadLen, this, m_Packet);
+		// 	if (!m_NextLayer)
+		// 		constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);
+		// }
+		// else if (SSHLayer::isSSHPort(portSrc, portDst))
+		// {
+		// 	setNextLayer(SSHLayer::createSSHMessage(payload, payloadLen, this, m_Packet));
+		// }
+		// else if (TelnetLayer::isDataValid(payload, payloadLen) &&
+		//          (TelnetLayer::isTelnetPort(portDst) || TelnetLayer::isTelnetPort(portSrc)))
+		// {
+		// 	constructNextLayer<TelnetLayer>(payload, payloadLen, m_Packet);
+		// }
+		// else if (FtpLayer::isFtpPort(portSrc) && FtpLayer::isDataValid(payload, payloadLen))
+		// {
+		// 	constructNextLayer<FtpResponseLayer>(payload, payloadLen, m_Packet);
+		// }
+		// else if (FtpLayer::isFtpPort(portDst) && FtpLayer::isDataValid(payload, payloadLen))
+		// {
+		// 	constructNextLayer<FtpRequestLayer>(payload, payloadLen, m_Packet);
+		// }
+		// else if (FtpLayer::isFtpDataPort(portSrc) || FtpLayer::isFtpDataPort(portDst))
+		// {
+		// 	constructNextLayer<FtpDataLayer>(payload, payloadLen, m_Packet);
+		// }
+		// else if (SomeIpLayer::isSomeIpPort(portSrc) || SomeIpLayer::isSomeIpPort(portDst))
+		// {
+		// 	setNextLayer(SomeIpLayer::parseSomeIpLayer(payload, payloadLen, this, m_Packet));
+		// }
+		// else if (TpktLayer::isDataValid(payload, payloadLen) && TpktLayer::isTpktPort(portSrc, portDst))
+		// {
+		// 	constructNextLayer<TpktLayer>(payload, payloadLen, m_Packet);
+		// }
+		// else if (SmtpLayer::isSmtpPort(portSrc) && SmtpLayer::isDataValid(payload, payloadLen))
+		// {
+		// 	constructNextLayer<SmtpResponseLayer>(payload, payloadLen, m_Packet);
+		// }
+		// else if (SmtpLayer::isSmtpPort(portDst) && SmtpLayer::isDataValid(payload, payloadLen))
+		// {
+		// 	constructNextLayer<SmtpRequestLayer>(payload, payloadLen, m_Packet);
+		// }
+		// else if (LdapLayer::isLdapPort(portDst) || LdapLayer::isLdapPort(portSrc))
+		// {
+		// 	m_NextLayer = LdapLayer::parseLdapMessage(payload, payloadLen, this, m_Packet);
+		// 	if (!m_NextLayer)
+		// 		constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);
+		// }
+		// else if ((GtpV2Layer::isGTPv2Port(portDst) || GtpV2Layer::isGTPv2Port(portSrc)) &&
+		//          GtpV2Layer::isDataValid(payload, payloadLen))
+		// {
+		// 	constructNextLayer<GtpV2Layer>(payload, payloadLen, m_Packet);
+		// }
+		// ==============================
+
 		else
 		{
 			constructNextLayer<PayloadLayer>(payload, payloadLen, m_Packet);

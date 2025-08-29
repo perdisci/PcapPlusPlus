@@ -4,11 +4,11 @@
 #include "IPv4Layer.h"
 #include "IPv6Layer.h"
 #include "PayloadLayer.h"
-#include "ArpLayer.h"
+// #include "ArpLayer.h"
 #include "VlanLayer.h"
-#include "PPPoELayer.h"
-#include "MplsLayer.h"
-#include "WakeOnLanLayer.h"
+// #include "PPPoELayer.h"
+// #include "MplsLayer.h"
+// #include "WakeOnLanLayer.h"
 #include "EndianPortable.h"
 
 namespace pcpp
@@ -45,23 +45,28 @@ namespace pcpp
 			tryConstructNextLayerWithFallback<IPv6Layer, PayloadLayer>(payload, payloadLen, m_Packet);
 			break;
 		case PCPP_ETHERTYPE_ARP:
-			tryConstructNextLayerWithFallback<ArpLayer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// Removed for debloating
+			// tryConstructNextLayerWithFallback<ArpLayer, PayloadLayer>(payload, payloadLen, m_Packet);
 			break;
 		case PCPP_ETHERTYPE_VLAN:
 		case PCPP_ETHERTYPE_IEEE_802_1AD:
 			tryConstructNextLayerWithFallback<VlanLayer, PayloadLayer>(payload, payloadLen, m_Packet);
 			break;
 		case PCPP_ETHERTYPE_PPPOES:
-			tryConstructNextLayerWithFallback<PPPoESessionLayer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// Removed for debloating
+			// tryConstructNextLayerWithFallback<PPPoESessionLayer, PayloadLayer>(payload, payloadLen, m_Packet);
 			break;
 		case PCPP_ETHERTYPE_PPPOED:
-			tryConstructNextLayerWithFallback<PPPoEDiscoveryLayer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// Removed for debloating
+			// tryConstructNextLayerWithFallback<PPPoEDiscoveryLayer, PayloadLayer>(payload, payloadLen, m_Packet);
 			break;
 		case PCPP_ETHERTYPE_MPLS:
-			tryConstructNextLayerWithFallback<MplsLayer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// Removed for debloating
+			// tryConstructNextLayerWithFallback<MplsLayer, PayloadLayer>(payload, payloadLen, m_Packet);
 			break;
 		case PCPP_ETHERTYPE_WAKE_ON_LAN:
-			tryConstructNextLayerWithFallback<WakeOnLanLayer, PayloadLayer>(payload, payloadLen, m_Packet);
+			// Removed for debloating
+			// tryConstructNextLayerWithFallback<WakeOnLanLayer, PayloadLayer>(payload, payloadLen, m_Packet);
 			break;
 		}
 

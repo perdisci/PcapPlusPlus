@@ -330,9 +330,38 @@ add_subdirectory(3rdParty)
 add_subdirectory(Common++)
 add_subdirectory(Packet++)
 
+##### Add more warnings and safety options for all modules
+foreach(target_module Common++ Packet++)
+  target_compile_options(${target_module} PRIVATE
+    -Wextra
+    -Wpedantic
+    -fstack-protector-strong
+    -ftrivial-auto-var-init=pattern
+  )
+
+  if(PCAPPP_USE_SANITIZER STREQUAL "AddressSanitizer")
+    target_compile_options(${target_module} PRIVATE -g)
+    target_compile_options(${target_module} PRIVATE -O1)
+    target_compile_options(${target_module} PRIVATE -fsanitize=address)
+    target_link_options(${target_module} PRIVATE -fsanitize=address)
+  else()
+    target_compile_options(${target_module} PRIVATE -O3)
+  endif()
+
+  # For Clang-specific or GCC-specific flags:
+  if(PCAPPP_TARGET_COMPILER_CLANG)
+    target_compile_options(${target_module} PRIVATE -D_LIBCPP_ENABLE_HARDENED_MODE=1)
+  elseif(PCAPPP_TARGET_COMPILER_GCC)
+    target_compile_options(${target_module} PRIVATE -D_GLIBCXX_ASSERTIONS)
+  endif()
+endforeach(target_module)
+####################################################################
+
+
 if(PCAPPP_BUILD_PCAPPP)
   add_subdirectory(Pcap++)
 
+  ##### Add more warnings and safety options for all modules
   target_compile_options(Pcap++ PRIVATE
     -O3
     -Wextra
@@ -341,13 +370,26 @@ if(PCAPPP_BUILD_PCAPPP)
     -ftrivial-auto-var-init=pattern
   )
 
+  if(PCAPPP_USE_SANITIZER STREQUAL "AddressSanitizer")
+    target_compile_options(Pcap++ PRIVATE -g)
+    target_compile_options(Pcap++ PRIVATE -O1)
+    target_compile_options(Pcap++ PRIVATE -fsanitize=address)
+    target_link_options(Pcap++ PRIVATE -fsanitize=address)
+  else()
+    target_compile_options(Pcap++ PRIVATE -O3)
+  endif()
+
   # For Clang-specific or GCC-specific flags:
   if(PCAPPP_TARGET_COMPILER_CLANG)
     target_compile_options(Pcap++ PRIVATE -D_LIBCPP_ENABLE_HARDENED_MODE=1)
   elseif(PCAPPP_TARGET_COMPILER_GCC)
     target_compile_options(Pcap++ PRIVATE -D_GLIBCXX_ASSERTIONS)
   endif()
+  ##################################################################
+
 endif()
+
+
 
 if(PCAPPP_BUILD_EXAMPLES)
   if(PCAPPP_BUILD_PCAPPP)
