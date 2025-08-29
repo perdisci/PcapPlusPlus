@@ -274,6 +274,7 @@ if(PCAPPP_TARGET_COMPILER_CLANG OR PCAPPP_TARGET_COMPILER_GCC OR PCAPPP_TARGET_C
 endif()
 
 if(PCAPPP_TARGET_COMPILER_CLANG OR PCAPPP_TARGET_COMPILER_GCC)
+  add_compile_options(-O3)
   add_compile_options(-Wextra)
   add_compile_options(-Wpedantic)
   add_compile_options(-fstack-protector-strong)
@@ -331,6 +332,21 @@ add_subdirectory(Packet++)
 
 if(PCAPPP_BUILD_PCAPPP)
   add_subdirectory(Pcap++)
+
+  target_compile_options(Pcap++ PRIVATE
+    -O3
+    -Wextra
+    -Wpedantic
+    -fstack-protector-strong
+    -ftrivial-auto-var-init=pattern
+  )
+
+  # For Clang-specific or GCC-specific flags:
+  if(PCAPPP_TARGET_COMPILER_CLANG)
+    target_compile_options(Pcap++ PRIVATE -D_LIBCPP_ENABLE_HARDENED_MODE=1)
+  elseif(PCAPPP_TARGET_COMPILER_GCC)
+    target_compile_options(Pcap++ PRIVATE -D_GLIBCXX_ASSERTIONS)
+  endif()
 endif()
 
 if(PCAPPP_BUILD_EXAMPLES)
