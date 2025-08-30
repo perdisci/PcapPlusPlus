@@ -111,7 +111,7 @@ set(
   header/PacketUtils.h
   header/PayloadLayer.h
   # header/PPPoELayer.h
-  # header/ProtocolType.h
+  header/ProtocolType.h
   # header/RadiusLayer.h
   header/RawPacket.h
   # header/S7CommLayer.h
