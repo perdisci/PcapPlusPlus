@@ -276,7 +276,6 @@ endif()
 if(PCAPPP_TARGET_COMPILER_CLANG OR PCAPPP_TARGET_COMPILER_GCC)
   add_compile_options(-O3)
   add_compile_options(-Wextra)
-  add_compile_options(-Wpedantic)
   add_compile_options(-fstack-protector-strong)
   add_compile_options(-ftrivial-auto-var-init=pattern)
 endif()
@@ -334,7 +333,6 @@ add_subdirectory(Packet++)
 foreach(target_module Common++ Packet++)
   target_compile_options(${target_module} PRIVATE
     -Wextra
-    -Wpedantic
     -fstack-protector-strong
     -ftrivial-auto-var-init=pattern
   )
@@ -365,7 +363,6 @@ if(PCAPPP_BUILD_PCAPPP)
   target_compile_options(Pcap++ PRIVATE
     -O3
     -Wextra
-    -Wpedantic
     -fstack-protector-strong
     -ftrivial-auto-var-init=pattern
   )
