@@ -277,6 +277,7 @@ if(PCAPPP_TARGET_COMPILER_CLANG OR PCAPPP_TARGET_COMPILER_GCC)
   add_compile_options(-O3)
   add_compile_options(-Wextra)
   add_compile_options(-Wno-unused-variable)
+  add_compile_options(-Wno-implicit-fallthrough)
   add_compile_options(-fstack-protector-strong)
   add_compile_options(-ftrivial-auto-var-init=pattern)
 endif()
@@ -334,6 +335,8 @@ add_subdirectory(Packet++)
 foreach(target_module Common++ Packet++)
   target_compile_options(${target_module} PRIVATE
     -Wextra
+    -Wno-unused-variable
+    -Wno-implicit-fallthrough
     -fstack-protector-strong
     -ftrivial-auto-var-init=pattern
   )
@@ -341,7 +344,6 @@ foreach(target_module Common++ Packet++)
   if(PCAPPP_USE_SANITIZER STREQUAL "AddressSanitizer")
     target_compile_options(${target_module} PRIVATE -g)
     target_compile_options(${target_module} PRIVATE -O1)
-    target_compile_options(${target_module} -Wno-unused-variable)
     target_compile_options(${target_module} PRIVATE -fsanitize=address)
     target_link_options(${target_module} PRIVATE -fsanitize=address)
   else()
@@ -365,6 +367,8 @@ if(PCAPPP_BUILD_PCAPPP)
   target_compile_options(Pcap++ PRIVATE
     -O3
     -Wextra
+    -Wno-unused-variable
+    -Wno-implicit-fallthrough
     -fstack-protector-strong
     -ftrivial-auto-var-init=pattern
   )
@@ -372,7 +376,6 @@ if(PCAPPP_BUILD_PCAPPP)
   if(PCAPPP_USE_SANITIZER STREQUAL "AddressSanitizer")
     target_compile_options(Pcap++ PRIVATE -g)
     target_compile_options(Pcap++ PRIVATE -O1)
-    target_compile_options(Pcap++ PRIVATE -Wno-unused-variable)
     target_compile_options(Pcap++ PRIVATE -fsanitize=address)
     target_link_options(Pcap++ PRIVATE -fsanitize=address)
   else()
