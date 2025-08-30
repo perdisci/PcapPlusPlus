@@ -1,7 +1,7 @@
 add_library(
   Packet++
   $<TARGET_OBJECTS:hash-library>
-  # src/ArpLayer.cpp
+  src/ArpLayer.cpp
   # src/Asn1Codec.cpp
   # src/BgpLayer.cpp
   # src/CiscoHdlcLayer.cpp
@@ -72,7 +72,7 @@ add_library(
 
 set(
   public_headers
-  # header/ArpLayer.h
+  header/ArpLayer.h
   # header/Asn1Codec.h
   # header/BgpLayer.h
   # header/CiscoHdlcLayer.h
